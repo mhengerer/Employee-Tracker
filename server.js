@@ -24,7 +24,7 @@ const db = mysql.createConnection(
         // username
         user: 'root',
         // password
-        password: 'Purplehaze98!',
+        password: '******',
         // TODO ADD DATABASE NAME 
         database: ''
     }
