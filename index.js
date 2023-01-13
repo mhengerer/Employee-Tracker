@@ -1,15 +1,28 @@
 const db = require("./server.js");
 
-const inquirer = require("inquirer");
+const inquirer = require('inquirer');
+const { query } = require("express");
+const cTable = require('console.table');
 
 // View All Employees
-const viewEmpl = () => {
-    db.query ('SELECT * FROM employee', (err, res) => {
+function viewEmpl() {
+    db.query('SELECT * FROM employee', (err, res) => {
         if (err) throw err
         console.table(res)
         startMenu()
     })
 };
+
+
+// function viewEmpl() {
+//    db.promise().query("SELECT * FROM employee")
+//   .then( ([res , err]) => {
+//     console.log(res);
+//   })
+//   .catch(console.log)
+//   .then( () => db.end());
+
+// }
 
 // 'View All Departments':
 const viewAllDept = () => {
@@ -156,13 +169,14 @@ const startMenu = () => {
         "Add Department",
         "Quit"
       ],
+      loop: false,
     },
   ])
   .then((data) => {
     const {request} = data;
     console.log(request);
     switch (request) {
-        case 'View All Employees':
+        case "View All Employees":
             viewEmpl();
             break;
         case 'Add Emplyee':

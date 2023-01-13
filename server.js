@@ -5,10 +5,12 @@ const inquirer = require('inquirer');
 const express = require('express');
 
 // import require console.table 
-const cTable = require('console.table');
-
+// const cTable = require('console.table');node
+const { table } = require('table');
 // import and require mysql2
-const mysql = reqire('mysql2');
+const mysql = require('mysql2');
+
+require('dotenv').config();
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -26,8 +28,8 @@ const db = mysql.createConnection(
         // password
         password: process.env.DB_PASSWORD,
         // name
-        database: process.env.DB_NAME
-    }
-    console.log('Successfully connected to ***** database!')
+        database: process.env.DB_NAME,
+    },
+    console.log('Successfully connected to database!')
 );
 
