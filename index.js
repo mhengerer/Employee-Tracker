@@ -6,24 +6,12 @@ const cTable = require('console.table');
 
 // View All Employees
 function viewEmpl() {
-
     db.query('SELECT * FROM employee', (err, res) => {
         if (err) throw err
         console.table(res)
         startMenu()
     })
 };
-
-
-// function viewEmpl() {
-//    db.promise().query("SELECT * FROM employee")
-//   .then( ([res , err]) => {
-//     console.log(res);
-//   })
-//   .catch(console.log)
-//   .then( () => db.end());
-
-// }
 
 // 'View All Departments':
 const viewAllDept = () => {
@@ -45,7 +33,7 @@ const viewAllRole = () => {
 
 // 'Add Emplyee':
 const newEmpl = () => {
-    db.query ('SELECT * FROM employee', (err, res) => {
+    db.query ('SELECT * FROM role', (err, res) => {
         if (err) throw err
         inquirer.prompt([
             {
@@ -64,12 +52,19 @@ const newEmpl = () => {
                 message: "What is the employee's role?",
                 choices: res.map(role => role.title)
             },
+            {
+                type: 'list',
+                name: 'managerId',
+                message: 'What is the ID of the manager?',
+                choices: [1, 2, 3, 4, 5, 7, 10, 12]
+            },
         ]) .then (data => {
-            let roleTitle = res.find(role => role.title === data.roletitle)
+            let roleTitle = res.find(role => role.title === data.role)
             db.query ('INSERT INTO employee SET ?', {
-                first_name: data.first_name,
-                last_name: data.last_name,
-                role_id: roleTitle.id
+                first_name: data.firstName,
+                last_name: data.lastName,
+                role_id: roleTitle.id,
+                manager_id: data.managerId,
             })
 
             startMenu();
@@ -79,12 +74,12 @@ const newEmpl = () => {
 
 // 'Add Role':
 const addRole = () => {
-    db.query ('SELECT * FROM role', (err, res) => {
+    db.query ('SELECT * FROM department', (err, res) => {
         if (err) throw err
         inquirer.prompt([
             {
                 type: 'input',
-                name: 'name',
+                name: 'title',
                 message: 'What is the name of the role?'
             },
             {
@@ -96,14 +91,14 @@ const addRole = () => {
                 type: 'list',
                 name: 'department',
                 message: 'Which department does the role belong to?',
-                choices: res.map(role => role.title)
+                choices: res.map(department => department.name)
             },
         ]) .then (data => {
-            let roleTitle = res.find(role => role.title === data.roletitle)
-            db.query ('INSERT INTO employee SET ?', {
-                first_name: data.first_name,
-                last_name: data.last_name,
-                role_id: roleTitle.id
+            let deptName = res.find(department => department.name === data.department)
+            db.query ('INSERT INTO role SET ?', {
+                title: data.title,
+                salary: data.salary,
+                department_id: deptName.id,
             })
 
             startMenu()
@@ -113,31 +108,18 @@ const addRole = () => {
 
 // 'Add Department':
 const addDept = () => {
-    db.query ('SELECT * FROM role', (err, res) => {
+    db.query ('SELECT * FROM department', (err, res) => {
         if (err) throw err
         inquirer.prompt([
             {
                 type: 'input',
-                name: '',
-                message: ''
-            },
-            {
-                type: 'input',
-                name: '',
-                message: ''
-            },
-            {
-                type: 'list',
-                name: '',
-                message: '',
-                choices: res.map(role => role.title)
+                name: 'name',
+                message: 'What is this new Department called?'
             },
         ]) .then (data => {
-            let roleTitle = res.find(role => role.title === data.roletitle)
-            db.query ('INSERT INTO employee SET ?', {
-                first_name: data.first_name,
-                last_name: data.last_name,
-                role_id: roleTitle.id
+            // let roleTitle = res.find(role => role.title === data.roletitle)
+            db.query ('INSERT INTO department SET ?', {
+                name: data.name,
             })
 
             startMenu()
@@ -147,8 +129,38 @@ const addDept = () => {
 
 //  'Update Employee Role':
 const updateEmplRole = () => {
-
+    db.query ('SELECT * FROM employee', (err, res) => {
+        if (err) throw err
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'whichEmp',
+                message: 'Which Employee would you like to Choose to Edit?',
+                choices: res.map(employee => employee.first_name + " " + employee.last_name)
+            }
+        ]) .then(data => {
+            const chosenEmp = res.find(employee => employee.first_name + " " + employee.last_name === data.whichEmp)
+            db.query ('SELECT * FROM role', (err, res) => {
+                if (err) throw err
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'newRole',
+                        message: 'What new role would you like to Give the Chosen Employee?',
+                        choices: res.map(role => role.title)
+                    }
+                ]) .then(data => {
+                    let chosenRole = res.find(role => role.title === data.newRole)
+                    db.query ('UPDATE employee SET role_id = ? WHERE id = ?', [chosenRole.id, chosenEmp.id], (err, res) => {
+                        if (err) throw err
+                        startMenu()
+                    })
+                })
+            })
+        })
+    })
 };
+
 // 'Quit':
 const endProg = () => {
 
@@ -174,9 +186,7 @@ const startMenu = () => {
     },
   ])
   .then((data) => {
-    console.log(data);
     const {menu} = data;
-    console.log(menu);
     switch (menu) {
         case "View All Employees":
             viewEmpl();
@@ -200,8 +210,7 @@ const startMenu = () => {
             addDept();
             break;
         case 'Quit':
-            endProg();
-            break;
+            process.exit(0);
     }
   })
 };
