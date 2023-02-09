@@ -33,3 +33,4 @@ const db = mysql.createConnection(
     console.log('Successfully connected to database!')
 );
 
+module.exports = db;

@@ -6,6 +6,7 @@ const cTable = require('console.table');
 
 // View All Employees
 function viewEmpl() {
+
     db.query('SELECT * FROM employee', (err, res) => {
         if (err) throw err
         console.table(res)
@@ -44,7 +45,7 @@ const viewAllRole = () => {
 
 // 'Add Emplyee':
 const newEmpl = () => {
-    db.query ('SELECT * FROM role', (err, res) => {
+    db.query ('SELECT * FROM employee', (err, res) => {
         if (err) throw err
         inquirer.prompt([
             {
@@ -71,7 +72,7 @@ const newEmpl = () => {
                 role_id: roleTitle.id
             })
 
-            startMenu()
+            startMenu();
         })
     })
 };
@@ -173,13 +174,14 @@ const startMenu = () => {
     },
   ])
   .then((data) => {
-    const {request} = data;
-    console.log(request);
-    switch (request) {
+    console.log(data);
+    const {menu} = data;
+    console.log(menu);
+    switch (menu) {
         case "View All Employees":
             viewEmpl();
             break;
-        case 'Add Emplyee':
+        case 'Add Employee':
             newEmpl();
             break;
         case 'Update Employee Role':
